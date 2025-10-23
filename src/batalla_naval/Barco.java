@@ -1,11 +1,14 @@
 package batalla_naval;
 
 public abstract class Barco {
-	private String nombre;
-	private int tamano;
-	private double vida;
+	protected String nombre;
+	protected int tamano;
+	protected int vida;
 	
-	public Barco() {
+	public Barco(String nombre, int tamano) {
+		this.nombre = nombre;
+		this.tamano = tamano;
+		this.vida = 0;
 	}
 	
 	public String getNombre() {
@@ -18,5 +21,13 @@ public abstract class Barco {
 	
 	public double getVida() {
 		return this.vida;
+	}
+
+	public void recibirImpacto() {
+		if (vida > 0 ) vida--;
+	}
+
+	public boolean estaHundido() {
+		return vida == 0;
 	}
 }
