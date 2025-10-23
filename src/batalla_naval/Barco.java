@@ -31,3 +31,21 @@ public abstract class Barco {
 		return vida == 0;
 	}
 }
+
+class PortaAviones extends Barco {
+	public PortaAviones() {
+		super("Portaaviones", 4);
+	}
+}
+
+class Submarino extends Barco {
+	public Submarino() {
+		super("Submarino", 3);
+	}
+}
+
+class Destructor extends Barco {
+	public Destructor() {
+		super("Destructor", 2);
+	}
+}
