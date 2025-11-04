@@ -23,4 +23,22 @@ public class Coordenada {
 	public void setOcupada(boolean ocupada) {
 		this.ocupada = ocupada;
 	}
+
+	@Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Coordenada c = (Coordenada) obj;
+        return fila == c.fila && columna == c.columna;
+    }
+
+    @Override
+    public int hashCode() {
+        return fila * 31 + columna;
+    }
+
+    @Override
+    public String toString() {
+        return "(" + fila + "," + columna + ")";
+    }
 }
