@@ -1,3 +1,5 @@
+package batalla_naval;
+
 public class Coordenada {
 	
 	private int fila;
