@@ -47,5 +47,36 @@ public class Tablero {
         barcos.add(barco);
     }
 
-    
+    public boolean recibirDisparos(Coordenada coord) {
+        int f = coord.getFila();
+        int c = coord.getColumna();
+        if (matriz[f][c] == 'B') {
+            matriz[f][c] = 'X';
+            return true;
+        } else if (matriz[f][c] == '~') {
+            matriz[f][c] = 'O';
+        }
+        return false;
+    }
+
+    public void mostrar() {
+        System.out.println("  A B C D E");
+        for (int i = 0; i < 5; i++) {
+            System.out.print((i + 1) + " ");
+            for (int j = 0; j < 5; j++)
+                System.out.print(matriz[i][j] + " ");
+            System.out.println();
+        }
+    }
+
+    public boolean todosBarcosHundidos() {
+        for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 5; j++) {
+            if (matriz[i][j] == 'B') { 
+                return false; 
+            }
+        }
+    }
+    return true;
+    }
 }
