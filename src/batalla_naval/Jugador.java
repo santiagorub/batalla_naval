@@ -3,8 +3,8 @@ package batalla_naval;
 import java.util.Scanner;
 
 public class Jugador {
-    private String nombre;
-    private Tablero tablero;
+    private final String nombre;
+    private final Tablero tablero;
 
     public Jugador(String nombre) {
         this.nombre = nombre;
@@ -23,7 +23,7 @@ public class Jugador {
         for (Barco b : barcos) {
             boolean colocado = false;
             while (!colocado) {
-                tablero.mostrar();
+                tablero.mostrar(true);
                 System.out.println("Colocando " + b.getNombre() + " (" + b.getTamano() + " casillas)");
 
                 System.out.print("Fila (1-5): ");
