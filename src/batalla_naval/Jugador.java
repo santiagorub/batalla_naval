@@ -41,7 +41,7 @@ public class Jugador {
                 }
             }
         }
-		sc.close();
+		//sc.close();
     }
 
     public boolean realizarAtaque(Coordenada coord, Jugador enemigo) {
@@ -52,6 +52,6 @@ public class Jugador {
     }
 
     public boolean todosBarcosHundidos() {
-        return this.todosBarcosHundidos();
+        return tablero.todosBarcosHundidos();
     }
 }
