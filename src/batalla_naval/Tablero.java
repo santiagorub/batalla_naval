@@ -1,134 +1,84 @@
 package batalla_naval;
-
-import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Tablero {
-    private char[][] matriz;
-    private ArrayList<Barco> barcos;
+    private final char[][] matriz = new char[5][5];
 
     public Tablero() {
-        matriz = new char[5][5];
-        barcos = new ArrayList<>();
-        for(int x = 0; x < 5; x++) {
-            for(int y = 0; y < 5; y++) {
-                matriz[x][y] = '~';
-            }
-        }
+        for (char[] fila : matriz) Arrays.fill(fila, '~');
     }
 
-    // Validar posicion
-    public boolean validarPosicion(int fila, int col, int tamano, boolean horizontal) {
-        if (!inRange(fila, col)) return false;
+    public boolean colocarBarco(Barco barco, int fila, int col, boolean horizontal) {
+        if (!validarPosicion(fila, col, barco.getTamano(), horizontal)) return false;
 
-        if (horizontal) {
-            if (col + tamano > 5) return false;
-            for(int i = 0; i < tamano; i++) {
-                if (matriz[fila][col+i] != '~') return false;
-            }
-        } else {
-            if (fila + tamano > 5) return false;
-            for(int i = 0; i < tamano; i++) {
-                if (matriz[fila+i][col] != '~') return false;
-            }
+        for (int i = 0; i < barco.getTamano(); i++) {
+            if (horizontal) matriz[fila][col + i] = 'B';
+            else matriz[fila + i][col] = 'B';
         }
         return true;
     }
 
-    //Colocar Barco
-    public void colocarBarco(Barco barco, int fila, int col, boolean horizontal) {
-        if (!validarPosicion(fila, col, barco.getTamano(), horizontal)){
-            System.out.println("Posición inválida para colocar el barco.");
-            return;
-        }
+    private boolean validarPosicion(int fila, int col, int tam, boolean hor) {
+        if (!inRange(fila, col)) return false;
+        if (hor && col + tam > 5) return false;
+        if (!hor && fila + tam > 5) return false;
 
-        if (horizontal) {
-            for(int i = 0; i < barco.getTamano(); i++) {
-                matriz[fila][col+i] = 'B';
-            }
-        } else {
-            for(int i = 0; i < barco.getTamano(); i++) {
-                matriz[fila+i][col] = 'B';
-            }
+        for (int i = 0; i < tam; i++) {
+            if (hor && matriz[fila][col + i] != '~') return false;
+            if (!hor && matriz[fila + i][col] != '~') return false;
         }
-
-        barcos.add(barco);
+        return true;
     }
 
-    //Recibir disparos
-    public boolean recibirDisparos(Coordenada coord) {
-        int f = coord.getFila();
-        int c = coord.getColumna();
-
-        if (!inRange(f, c)){
-            System.out.println("Coordenada fuera de rango.");
-            return false;
+    public boolean recibirDisparo(Coordenada c) {
+        if (!inRange(c.getFila(), c.getColumna())) return false;
+        char actual = matriz[c.getFila()][c.getColumna()];
+        if (actual == 'B') { 
+            matriz[c.getFila()][c.getColumna()] = 'X'; 
+            return true; 
         }
-
-        if (matriz[f][c] == 'B') {
-            matriz[f][c] = 'X';
-            return true;
-        } else if (matriz[f][c] == '~') {
-            matriz[f][c] = 'O';
-            return false;
-        } else if (matriz[f][c] == 'X' || matriz[f][c] == 'O') {
-            System.out.println("Ya has atacado esta coordenada.");
-            return false;
+        if (actual == '~') { 
+            matriz[c.getFila()][c.getColumna()] = 'O'; 
+            return false; 
         }
+        System.out.println("Ya se atacó esa coordenada.");
         return false;
     }
 
-    //Mostrar tablero propio
-    public void mostrarPropio(){
-        System.out.println("\nTu tablero:");
-        mostrar(true);
-    }
-
-    //Mostrar tablero enemigo
-    public void mostrarEnemigo(){
-        System.out.println("\nTablero enemigo:");
-        mostrar(false);
-    }
-
-    //Mostrar tablero
     public void mostrar(boolean mostrarBarcos) {
         System.out.println("  A B C D E");
         for (int i = 0; i < 5; i++) {
             System.out.print((i + 1) + " ");
             for (int j = 0; j < 5; j++) {
-                char celda = matriz[i][j];
-                if (celda == 'B' && !mostrarBarcos) {
-                System.out.print("~ ");
-                } else {
-                    System.out.print(celda + " ");
-                }
+                char c = matriz[i][j];
+                if (c == 'B' && !mostrarBarcos) c = '~';
+                System.out.print(c + " ");
             }
             System.out.println();
         }
     }
 
-    // Verificar si todos los barcos estan hundidos 
     public boolean todosBarcosHundidos() {
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 5; j++) {
-                if (matriz[i][j] == 'B') { 
-                    return false;
-                }
-            }
-        }
+        for (char[] fila : matriz)
+            for (char c : fila)
+                if (c == 'B') return false;
         return true;
     }
 
-    // Verificar si una coordenada esta dentro del rango del tablero
-    private boolean inRange(int fila, int col) {
-        return fila >= 0 && fila < 5 && col >= 0 && col < 5;
+    private boolean inRange(int f, int c) {
+        return f >= 0 && f < 5 && c >= 0 && c < 5;
     }
 
-    // Contar partes de barcos restantes
-    public int partesRestantes() {
-        int count = 0;
-        for (char[] fila : matriz)
-            for (char celda : fila)
-                if (celda == 'B') count++;
-        return count;
+    public String filaComoTexto(int fila, boolean mostrarBarcos) {
+    StringBuilder sb = new StringBuilder();
+    sb.append(fila + 1).append(" ");
+    for (int j = 0; j < 5; j++) {
+        char c = matriz[fila][j];
+        if (c == 'B' && !mostrarBarcos) c = '~';
+        sb.append(c).append(" ");
     }
+    return sb.toString();
+}
+
+
 }

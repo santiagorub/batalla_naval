@@ -3,114 +3,96 @@ package batalla_naval;
 import java.util.Scanner;
 
 public class Partida {
-
-    private Jugador jugador1;
-    private Jugador jugador2;
-    private boolean turnoJugador1 = true;
+    private final Jugador j1, j2;
+    private boolean turnoJ1 = true;
 
     public Partida() {
         Scanner sc = new Scanner(System.in);
+        System.out.println("=== BATALLA NAVAL ===");
 
-        System.out.println("=== Batalla Naval ===");
+        j1 = new Jugador(pedirAlias(sc, "Jugador 1"));
+        j2 = new Jugador(pedirAlias(sc, "Jugador 2"));
 
-        // Jugadores ingresan alias
-        System.out.println("\nJugador 1:");
-        String alias1 = pedirAlias(sc);
+        System.out.println("\n--- Colocación de barcos ---");
+        j1.colocarBarcos();
+        j2.colocarBarcos();
 
-        System.out.println("\nJugador 2:");
-        String alias2 = pedirAlias(sc);
+        System.out.println("\n--- ¡Comienza la batalla! ---");
+        jugar(sc);
 
-        jugador1 = new Jugador(alias1);
-        jugador2 = new Jugador(alias2);
-
-        // Colocar barcos
-        jugador1.colocarBarcos();
-        jugador2.colocarBarcos();
-
-        // Iniciar juego
-        iniciar(sc);
+        sc.close();
     }
 
-    private void iniciar(Scanner sc) {
-
-    sc.nextLine(); // <-- limpieza de buffer inicial
-
-    while (true) {
-
-        Jugador actual = turnoJugador1 ? jugador1 : jugador2;
-        Jugador enemigo = turnoJugador1 ? jugador2 : jugador1;
-
-        System.out.println("\nTurno de: " + actual.getNombre());
-
-        enemigo.getTablero().mostrarEnemigo();
-        actual.getTablero().mostrarPropio();
-
-        System.out.print("Ingrese coordenada (Ej: A3) o presione ESC + ENTER para salir: ");
-        String input = sc.nextLine();
-
-        // ✅ Detectar ESC
-        if (verificarSalida(input, sc)) {
-            System.out.println(actual.getNombre() + " abandonó la partida.");
-            break;
-        }
-
-        // Validación mínima del input
-        if (input.length() != 2) {
-            System.out.println("Formato inválido. Ejemplo válido: B2");
-            continue;
-        }
-
-        char colChar = Character.toUpperCase(input.charAt(0));
-        int col = colChar - 'A';
-        int fila = Character.getNumericValue(input.charAt(1)) - 1;
-
-        Coordenada disparo = new Coordenada(fila, col);
-
-        boolean acierto = actual.realizarAtaque(disparo, enemigo);
-
-        if (enemigo.todosBarcosHundidos()) {
-            System.out.println("¡" + actual.getNombre() + " GANÓ!");
-            break;
-        }
-
-        if (!acierto) {
-            turnoJugador1 = !turnoJugador1;
-        }
-    }
-}
-
-
-    // MÉTODO NUEVO → pide alias con validación
-    private String pedirAlias(Scanner sc) {
-        String alias;
-
+    private void jugar(Scanner sc) {
         while (true) {
-            System.out.print("Ingrese su alias de 3 letras (MAYÚSCULAS o minúsculas): ");
-            alias = sc.next().trim().toUpperCase();
+            Jugador actual = turnoJ1 ? j1 : j2;
+            Jugador enemigo = turnoJ1 ? j2 : j1;
 
-            if (alias.matches("[A-Z]{3}")) {
-                System.out.println("Alias confirmado: " + alias);
-                return alias;
+            System.out.println("\nTurno de " + actual.getNombre());
+            System.out.println("                                     ");            
+            mostrarTableros(actual, enemigo);
+
+            System.out.print("Ingrese coordenada (ej: A3) o escriba ESC para salir: ");
+            String input = sc.next().trim().toUpperCase();
+
+            if (input.equals("ESC")) {
+                System.out.print("¿Seguro que desea salir? (S/N): ");
+                if (sc.next().trim().equalsIgnoreCase("S")) {
+                    System.out.println("Partida finalizada por el jugador.");
+                    break;
+                }
+                continue;
             }
 
-            System.out.println("Alias inválido. Debe contener EXACTAMENTE 3 letras (ej: ABC).");
+            if (input.length() != 2) {
+                System.out.println("Formato inválido. Use una letra y un número (ej: B2).");
+                continue;
+            }
+
+            char letra = input.charAt(0);
+            int col = letra - 'A';
+            int fila = Character.getNumericValue(input.charAt(1)) - 1;
+
+            if (col < 0 || col > 4 || fila < 0 || fila > 4) {
+                System.out.println("Coordenada fuera de rango. Use A-E y 1-5.");
+                continue;
+            }
+
+            Coordenada coord = new Coordenada(fila, col);
+            boolean acierto = actual.realizarAtaque(coord, enemigo);
+
+            if (enemigo.todosBarcosHundidos()) {
+                System.out.println(actual.getNombre() + " ha ganado la partida!");
+                break;
+            }
+
+            if (!acierto) {
+                turnoJ1 = !turnoJ1; // solo cambia de turno si falló
+            }
         }
     }
 
-    // Detecta si el usuario quiere salir usando ESC
-    private boolean verificarSalida(String input, Scanner sc) {
-    // El caracter ESC = ASCII 27
-        if (input.length() == 1 && input.charAt(0) == 27) {
-            System.out.println("¿Seguro que deseas salir? (ENTER para confirmar, cualquier tecla para cancelar)");
-            String confirm = sc.nextLine();
-
-        if (confirm.isEmpty()) {
-            System.out.println("Saliendo de la partida...");
-            return true;
+    private String pedirAlias(Scanner sc, String msg) {
+        while (true) {
+            System.out.print(msg + " - Ingrese un alias de 3 letras: ");
+            String alias = sc.next().trim().toUpperCase();
+            if (alias.matches("[A-Z]{3}")) return alias;
+            System.out.println("Alias inválido. Ejemplo válido: ABC");
         }
-
-        System.out.println("Operación cancelada. Continuando...");
-        }
-        return false;
     }
+
+    private void mostrarTableros(Jugador actual, Jugador enemigo) {
+    System.out.println("                                     ");
+    System.out.println("  Tu tablero      Tablero enemigo");
+    System.out.println("                                     ");
+    System.out.println("  A B C D E          A B C D E");
+
+    for (int i = 0; i < 5; i++) {
+        String filaPropia = actual.getTablero().filaComoTexto(i, true);
+        String filaEnemiga = enemigo.getTablero().filaComoTexto(i, false);
+        System.out.printf("%s       %s%n", filaPropia, filaEnemiga);
+    }
+
+    
+}
 }

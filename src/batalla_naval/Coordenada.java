@@ -2,8 +2,8 @@ package batalla_naval;
 
 public class Coordenada {
 	
-	private int fila;
-	private int columna;
+	private final int fila;
+	private final int columna;
 	private boolean ocupada;
 	
 	public Coordenada(int fila, int columna) {
