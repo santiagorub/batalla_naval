@@ -1,53 +1,40 @@
 package batalla_naval;
+
 import java.io.*;
-import java.nio.file.*;
-import java.time.LocalDate;
 import java.util.*;
 
 public class Historial {
     private static final String ARCHIVO = "historial.txt";
+    private final Map<String, Integer> victorias = new HashMap<>();
 
-    public static void registrar(String j1, String j2, String ganador) {
-        try (PrintWriter pw = new PrintWriter(new FileWriter(ARCHIVO, true))) {
-            pw.println(j1 + " vs " + j2 + " - Ganador: " + ganador + " - Fecha: " + LocalDate.now());
+    public void registrarPartida(String alias1, String alias2, String ganador) {
+        try (FileWriter fw = new FileWriter(ARCHIVO, true)) {
+            String linea = String.format("%s vs %s - Ganador: %s - Fecha: %s%n",
+                    alias1, alias2, ganador, new Date());
+            fw.write(linea);
+            victorias.put(ganador, victorias.getOrDefault(ganador, 0) + 1);
         } catch (IOException e) {
-            System.out.println("Error al guardar historial.");
+            System.out.println("Error al guardar el historial: " + e.getMessage());
         }
     }
 
-    public static void mostrarRanking() {
-        Map<String, Integer> victorias = new HashMap<>();
+    public void mostrarRanking() {
+        System.out.println("\n=== Ranking de Jugadores ===");
+        List<Map.Entry<String, Integer>> lista = new ArrayList<>(victorias.entrySet());
 
-        try {
-            for (String linea : Files.readAllLines(Paths.get(ARCHIVO))) {
-                if (linea.contains("Ganador:")) {
-                    String ganador = linea.split("Ganador: ")[1].split(" -")[0].trim();
-                    victorias.put(ganador, victorias.getOrDefault(ganador, 0) + 1);
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("No se pudo leer el historial.");
-            return;
-        }
-
-        ArrayList<Map.Entry<String, Integer>> lista = new ArrayList<>(victorias.entrySet());
-        insertion(lista);
-
-        System.out.println("\n===  RANKING DE JUGADORES  ===");
-        for (Map.Entry<String, Integer> e : lista)
-            System.out.println(e.getKey() + ": " + e.getValue() + " victorias");
-    }
-
-    private static void insertion(ArrayList<Map.Entry<String, Integer>> lista) {
+        // 🔹 Ordenamos con Insertion Sort (sencillo)
         for (int i = 1; i < lista.size(); i++) {
-            Map.Entry<String, Integer> key = lista.get(i);
+            Map.Entry<String, Integer> actual = lista.get(i);
             int j = i - 1;
-
-            while (j >= 0 && key.getValue() > lista.get(j).getValue()) {
+            while (j >= 0 && lista.get(j).getValue() < actual.getValue()) {
                 lista.set(j + 1, lista.get(j));
                 j--;
             }
-            lista.set(j + 1, key);
+            lista.set(j + 1, actual);
+        }
+
+        for (Map.Entry<String, Integer> e : lista) {
+            System.out.println(e.getKey() + ": " + e.getValue() + " victorias");
         }
     }
 }

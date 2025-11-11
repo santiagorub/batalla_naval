@@ -5,6 +5,7 @@ import java.util.Scanner;
 public class Partida {
     private final Jugador j1, j2;
     private boolean turnoJ1 = true;
+    private final Historial historial = new Historial();
 
     public Partida() {
         Scanner sc = new Scanner(System.in);
@@ -70,6 +71,7 @@ public class Partida {
                 turnoJ1 = !turnoJ1; // solo cambia de turno si falló
             }
         }
+        historial.mostrarRanking();
     }
 
     private String pedirAlias(Scanner sc, String msg) {
