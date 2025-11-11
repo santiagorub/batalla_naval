@@ -8,7 +8,7 @@ public abstract class Barco {
 	public Barco(String nombre, int tamano) {
 		this.nombre = nombre;
 		this.tamano = tamano;
-		this.vida = 0;
+		this.vida = tamano;
 	}
 	
 	public String getNombre() {
@@ -19,7 +19,7 @@ public abstract class Barco {
 		return this.tamano;
 	}
 	
-	public double getVida() {
+	public int getVida() {
 		return this.vida;
 	}
 

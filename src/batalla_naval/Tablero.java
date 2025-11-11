@@ -1,82 +1,84 @@
 package batalla_naval;
-
-import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Tablero {
-    private char[][] matriz;
-    private ArrayList<Barco> barcos;
+    private final char[][] matriz = new char[5][5];
 
     public Tablero() {
-        matriz = new char[5][5];
-        barcos = new ArrayList<>();
-        for(int x = 0; x < 5; x++) {
-            for(int y = 0; y < 5; y++) {
-                matriz[x][y] = '~';
-            }
-        }
+        for (char[] fila : matriz) Arrays.fill(fila, '~');
     }
 
-    public boolean validarPosicion(int fila, int col, int tamano, boolean horizontal) {
-        if (horizontal) {
-            if (col + tamano > 5) return false;
-            for(int i = 0; i < tamano; i++) {
-                if (matriz[fila][col+i] != '~') return false;
-            }
-        } else {
-            if (fila + tamano > 5) return false;
-            for(int i = 0; i < tamano; i++) {
-                if (matriz[fila+i][col] != '~') return false;
-            }
+    public boolean colocarBarco(Barco barco, int fila, int col, boolean horizontal) {
+        if (!validarPosicion(fila, col, barco.getTamano(), horizontal)) return false;
+
+        for (int i = 0; i < barco.getTamano(); i++) {
+            if (horizontal) matriz[fila][col + i] = 'B';
+            else matriz[fila + i][col] = 'B';
         }
         return true;
     }
 
-    public void colocarBarco(Barco barco, int fila, int col, boolean horizontal) {
-        if (!validarPosicion(fila, col, barco.getTamano(), horizontal)) return;
+    private boolean validarPosicion(int fila, int col, int tam, boolean hor) {
+        if (!inRange(fila, col)) return false;
+        if (hor && col + tam > 5) return false;
+        if (!hor && fila + tam > 5) return false;
 
-        if (horizontal) {
-            for(int i = 0; i < barco.getTamano(); i++) {
-                matriz[fila][col+i] = 'B';
-            }
-        } else {
-            for(int i = 0; i < barco.getTamano(); i++) {
-                matriz[fila+i][col] = 'B';
-            }
+        for (int i = 0; i < tam; i++) {
+            if (hor && matriz[fila][col + i] != '~') return false;
+            if (!hor && matriz[fila + i][col] != '~') return false;
         }
-
-        barcos.add(barco);
+        return true;
     }
 
-    public boolean recibirDisparos(Coordenada coord) {
-        int f = coord.getFila();
-        int c = coord.getColumna();
-        if (matriz[f][c] == 'B') {
-            matriz[f][c] = 'X';
-            return true;
-        } else if (matriz[f][c] == '~') {
-            matriz[f][c] = 'O';
+    public boolean recibirDisparo(Coordenada c) {
+        if (!inRange(c.getFila(), c.getColumna())) return false;
+        char actual = matriz[c.getFila()][c.getColumna()];
+        if (actual == 'B') { 
+            matriz[c.getFila()][c.getColumna()] = 'X'; 
+            return true; 
         }
+        if (actual == '~') { 
+            matriz[c.getFila()][c.getColumna()] = 'O'; 
+            return false; 
+        }
+        System.out.println("Ya se atacó esa coordenada.");
         return false;
     }
 
-    public void mostrar() {
+    public void mostrar(boolean mostrarBarcos) {
         System.out.println("  A B C D E");
         for (int i = 0; i < 5; i++) {
             System.out.print((i + 1) + " ");
-            for (int j = 0; j < 5; j++)
-                System.out.print(matriz[i][j] + " ");
+            for (int j = 0; j < 5; j++) {
+                char c = matriz[i][j];
+                if (c == 'B' && !mostrarBarcos) c = '~';
+                System.out.print(c + " ");
+            }
             System.out.println();
         }
     }
 
     public boolean todosBarcosHundidos() {
-        for (int i = 0; i < 5; i++) {
-        for (int j = 0; j < 5; j++) {
-            if (matriz[i][j] == 'B') { 
-                return false; 
-            }
-        }
+        for (char[] fila : matriz)
+            for (char c : fila)
+                if (c == 'B') return false;
+        return true;
     }
-    return true;
+
+    private boolean inRange(int f, int c) {
+        return f >= 0 && f < 5 && c >= 0 && c < 5;
     }
+
+    public String filaComoTexto(int fila, boolean mostrarBarcos) {
+    StringBuilder sb = new StringBuilder();
+    sb.append(fila + 1).append(" ");
+    for (int j = 0; j < 5; j++) {
+        char c = matriz[fila][j];
+        if (c == 'B' && !mostrarBarcos) c = '~';
+        sb.append(c).append(" ");
+    }
+    return sb.toString();
+}
+
+
 }
