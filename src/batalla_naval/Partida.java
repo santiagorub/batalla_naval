@@ -11,6 +11,9 @@ public class Partida {
         Scanner sc = new Scanner(System.in);
         System.out.println("=== BATALLA NAVAL ===");
 
+        historial.mostrarHistorial();
+        historial.mostrarRanking();
+
         j1 = new Jugador(pedirAlias(sc, "Jugador 1"));
         j2 = new Jugador(pedirAlias(sc, "Jugador 2"));
 
@@ -40,6 +43,10 @@ public class Partida {
                 System.out.print("¿Seguro que desea salir? (S/N): ");
                 if (sc.next().trim().equalsIgnoreCase("S")) {
                     System.out.println("Partida finalizada por el jugador.");
+                    String ganador = turnoJ1 ? j2.getNombre() : j1.getNombre();
+                    historial.registrarPartida(j1.getNombre(), j2.getNombre(), ganador);
+                    historial.mostrarHistorial();
+                    historial.mostrarRanking();
                     break;
                 }
                 continue;
@@ -64,11 +71,22 @@ public class Partida {
 
             if (enemigo.todosBarcosHundidos()) {
                 System.out.println(actual.getNombre() + " ha ganado la partida!");
+                historial.registrarPartida(j1.getNombre(), j2.getNombre(), actual.getNombre());
                 break;
             }
 
             if (!acierto) {
-                turnoJ1 = !turnoJ1; // solo cambia de turno si falló
+                System.out.println("\nTurno finalizado. Presione ENTER para pasar el turno...");
+                sc.nextLine(); // limpia buffer
+                sc.nextLine(); // espera ENTER del jugador actual
+
+                for (int i = 0; i < 40; i++) System.out.println(); // limpia la pantalla
+
+                System.out.println("Jugador siguiente, presione ENTER cuando esté listo...");
+                sc.nextLine(); // espera ENTER del jugador siguiente
+
+                for (int i = 0; i < 40; i++) System.out.println(); // limpia otra vez antes de mostrar
+                turnoJ1 = !turnoJ1; // cambia el turno
             }
         }
         historial.mostrarRanking();
