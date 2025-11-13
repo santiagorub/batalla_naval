@@ -138,7 +138,7 @@ public class Historial {
 
     /**
      * Muestra un ranking de jugadores ordenado por cantidad de victorias.
-     * Se utiliza un algoritmo de ordenamiento Insertion Sort (descendente).
+     * Se utiliza un algoritmo de ordenamiento Insertion Sort.
      */
     public void mostrarRanking() {
 
@@ -147,7 +147,7 @@ public class Historial {
         // Convertir mapa a lista para poder ordenarlo
         List<Map.Entry<String, Integer>> lista = new ArrayList<>(victorias.entrySet());
 
-        // ---------- INSERTION SORT DESCENDENTE ----------
+        // ---------- INSERTION SORT ----------
         for (int i = 1; i < lista.size(); i++) {
 
             Map.Entry<String, Integer> actual = lista.get(i);
