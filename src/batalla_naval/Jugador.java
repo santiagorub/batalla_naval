@@ -11,15 +11,17 @@ import java.util.Scanner;
  * <p>Incluye validaciones de entrada de usuario para asegurar que
  * las coordenadas y orientaciones sean correctas.</p>
  * 
- * @author Tobias Villarroel
- * @author Santiago Opazo
  * @author Valentina Diaz
+ * @author Santiago Opazo
+ * @author Tobias Villarroel
  * 
  * @version 1.0
  */
 public class Jugador {
+
     /** Nombre o alias del jugador (3 letras mayúsculas). */
     private final String nombre;
+
     /** Tablero asociado al jugador. */
     private final Tablero tablero;
 
@@ -29,8 +31,8 @@ public class Jugador {
      * @param nombre alias del jugador
      */
     public Jugador(String nombre) {
-        this.nombre = nombre;
-        this.tablero = new Tablero();
+        this.nombre = nombre;   // Se asigna el nombre ingresado
+        this.tablero = new Tablero(); // Cada jugador arranca con un tablero vacío
     }
 
     /** @return el nombre del jugador */
@@ -46,22 +48,31 @@ public class Jugador {
      */
     public void colocarBarcos() {
         Scanner sc = new Scanner(System.in);
+
+        // Arreglo de barcos: cada jugador coloca estos 3
         Barco[] barcos = { new Destructor(), new Submarino(), new PortaAviones() };
 
         System.out.println("\nColocando barcos para " + nombre + "...\n");
 
+        // Bucle para colocar todos los barcos uno por uno
         for (Barco b : barcos) {
             boolean colocado = false;
+
+            // Intentar hasta que el jugador consiga una posición válida
             while (!colocado) {
-                tablero.mostrar(true);
+
+                tablero.mostrar(true); // Se muestra el tablero propio
+
                 System.out.println("Colocando " + b.getNombre() + " (" + b.getTamano() + " casillas)");
 
+                // Pedir coordenadas y orientación al jugador
                 int fila = pedirFila(sc);
                 int col = pedirColumna(sc);
                 boolean horizontal = pedirOrientacion(sc);
 
+                // Intentar colocar el barco en el tablero
                 if (tablero.colocarBarco(b, fila, col, horizontal)) {
-                    colocado = true;
+                    colocado = true; // Se colocó correctamente
                 } else {
                     System.out.println("Posición inválida o superpuesta. Intente nuevamente.");
                 }
@@ -70,11 +81,14 @@ public class Jugador {
 
         System.out.println("\n¡Todos los barcos colocados, " + nombre + "!");
         tablero.mostrar(true);
-        System.out.println("\nPresione ENTER para continuar...");
-        sc.nextLine(); 
-        sc.nextLine(); 
 
+        System.out.println("\nPresione ENTER para continuar...");
+        sc.nextLine(); // Consumir buffer
+        sc.nextLine(); // Esperar ENTER
+
+        // Limpiar pantalla simuladamente
         for (int i = 0; i < 40; i++) System.out.println();
+
         System.out.println("Turno del siguiente jugador...");
     }
 
@@ -87,11 +101,17 @@ public class Jugador {
         while (true) {
             System.out.print("Fila (1-5): ");
             String input = sc.next().trim();
+
             try {
-                int fila = Integer.parseInt(input) - 1;
-                if (fila >= 0 && fila < 5) return fila;
+                int fila = Integer.parseInt(input) - 1; // Convertir de 1–5 a 0–4
+
+                if (fila >= 0 && fila < 5) 
+                    return fila; // Fila válida
+
                 System.out.println("Debe ingresar un número entre 1 y 5.");
+
             } catch (NumberFormatException e) {
+                // El usuario ingresó letras o símbolos
                 System.out.println("Entrada inválida. Use un número entre 1 y 5.");
             }
         }
@@ -105,9 +125,12 @@ public class Jugador {
     private int pedirColumna(Scanner sc) {
         while (true) {
             System.out.print("Columna (A-E): ");
-            String input = sc.next().trim().toUpperCase();
+            String input = sc.next().trim().toUpperCase(); // Convertir a mayúscula
+
+            // Validar que sea una sola letra válida
             if (input.length() == 1 && input.charAt(0) >= 'A' && input.charAt(0) <= 'E')
-                return input.charAt(0) - 'A';
+                return input.charAt(0) - 'A'; // Convertir A–E a 0–4
+
             System.out.println("Entrada inválida. Use una letra entre A y E.");
         }
     }
@@ -121,8 +144,10 @@ public class Jugador {
         while (true) {
             System.out.print("Orientación (H = horizontal, V = vertical): ");
             String input = sc.next().trim().toUpperCase();
-            if (input.equals("H")) return true;
-            if (input.equals("V")) return false;
+
+            if (input.equals("H")) return true;  // Horizontal
+            if (input.equals("V")) return false; // Vertical
+
             System.out.println("Entrada inválida. Escriba H o V.");
         }
     }
@@ -136,9 +161,15 @@ public class Jugador {
      * @return {@code true} si hubo impacto, {@code false} si fue agua
      */
     public boolean realizarAtaque(Coordenada coord, Jugador enemigo) {
+
+        // Se delega al tablero enemigo para verificar impacto
         boolean acierto = enemigo.getTablero().recibirDisparo(coord);
-        if (acierto) System.out.println("¡Impacto!");
-        else System.out.println("¡Agua!");
+
+        if (acierto) 
+            System.out.println("¡Impacto!");
+        else 
+            System.out.println("¡Agua!");
+
         return acierto;
     }
 
@@ -147,6 +178,6 @@ public class Jugador {
      * @return {@code true} si no quedan barcos, {@code false} en caso contrario
      */
     public boolean todosBarcosHundidos() {
-        return tablero.todosBarcosHundidos();
+        return tablero.todosBarcosHundidos(); // Delegado al tablero
     }
 }
