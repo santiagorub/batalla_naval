@@ -1,1 +1,0 @@
-typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html","k":"18"},{"p":"batalla_naval","l":"Barco"},{"p":"batalla_naval","l":"Coordenada"},{"p":"batalla_naval","l":"Historial"},{"p":"batalla_naval","l":"Jugador"},{"p":"batalla_naval","l":"Main"},{"p":"batalla_naval","l":"Partida"},{"p":"batalla_naval","l":"Tablero"}];updateSearchResults();
